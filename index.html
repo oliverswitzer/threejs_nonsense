@@ -1,0 +1,113 @@
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+    <title>Three Tutorial</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r79/three.js" type="text/javascript" charset="utf-8"></script>
+  </head>
+  <body>
+    <div id="container">
+
+    </div>
+    <script type="text/javascript" charset="utf-8">
+      const WIDTH = window.screen.width;
+      const HEIGHT = window.screen.height;
+
+      const VIEW_ANGLE= 45;
+      const ASPECT = WIDTH / HEIGHT;
+      const NEAR = 0.1;
+      const FAR = 10000;
+
+      const container = document.querySelector("#container");
+
+      const renderer = new THREE.WebGLRenderer();
+      const camera = new THREE.PerspectiveCamera(
+            VIEW_ANGLE,
+            ASPECT,
+            NEAR,
+            FAR
+          );
+
+      const scene = new THREE.Scene();
+
+      scene.add(camera);
+
+      renderer.setSize(WIDTH, HEIGHT);
+
+      container.appendChild(renderer.domElement);
+
+      const RADIUS = 50;
+      const SEGMENTS = 16
+      const RINGS = 16;
+
+      const sphereMaterial =
+        new THREE.MeshLambertMaterial(
+            {
+              color: 0xCC0000
+            }
+        );
+
+      const sphere = new THREE.Mesh(
+          new THREE.SphereGeometry(
+            RADIUS,
+            SEGMENTS,
+            RINGS),
+
+          sphereMaterial);
+
+      sphere.position.z = -300;
+      scene.add(sphere);
+
+      const pointLight = new THREE.PointLight(0xFFFFFF);
+
+      pointLight.position.x = 10;
+      pointLight.position.y = 100;
+      pointLight.position.z = 130;
+
+      scene.add(pointLight);
+
+      stepsTaken = 0;
+      direction = 1;
+
+      console.log(sphere.position.z)
+
+      function update() {
+        updateSphere(sphere);
+
+        renderer.render(scene, camera);
+
+        requestAnimationFrame(update);
+      }
+
+      function goForward() {
+        direction = 1;
+      }
+
+      function goBackward() {
+        direction = -1;
+      }
+
+      function updateSphere(sphere) {
+        sphere.position.z = sphere.position.z + direction;
+        pointLight.position.z = + pointLight.position.z + (direction*10);
+        pointLight.position.x = + pointLight.position.x + (direction*10);
+
+        stepsTaken += 1;
+
+        if(stepsTaken > 70 && sphere.position.z > -60){
+          stepsTaken = 0;
+          direction = -1;
+        } else if (stepsTaken > 70 && sphere.position.z < -300) {
+          stepsTaken = 0;
+          direction = +1;
+        }
+      }
+
+      requestAnimationFrame(update)
+    </script>
+      <input type="button" onclick="goForward()" id="go-forward" value="Go Forward" />
+      <br>
+      <input type="button" onclick="goBackward()" id="go-backward" value="Go Backward" />
+  </body>
+</html>
